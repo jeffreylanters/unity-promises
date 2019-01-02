@@ -17,12 +17,16 @@ public class Promise<T> {
   public Promise (Action<Action<T>, Action<string>> executor) {
     executor (
       value => {
+        if (this.state != State.pending)
+          return;
         this.state = State.fulfilled;
         if (this.onFulfilled != null)
           this.onFulfilled (value);
         if (this.onFinally != null)
           this.onFinally ();
       }, reason => {
+        if (this.state != State.pending)
+          return;
         this.state = State.rejected;
         if (this.onRejected != null)
           this.onRejected (reason);
@@ -44,5 +48,9 @@ public class Promise<T> {
   public Promise<T> Finally (Action onFinally) {
     this.onFinally = onFinally;
     return this;
+  }
+
+  public void Consume () {
+    this.state = State.rejected;
   }
 }
