@@ -6,14 +6,24 @@ public class Promise<T> {
   private Action<string> onRejected;
   private Action onFinally;
 
+  public State state = State.rejected;
+
+  public enum State {
+    pending,
+    fulfilled,
+    rejected
+  }
+
   public Promise (Action<Action<T>, Action<string>> executor) {
     executor (
       value => {
+        this.state = State.fulfilled;
         if (this.onFulfilled != null)
           this.onFulfilled (value);
         if (this.onFinally != null)
           this.onFinally ();
       }, reason => {
+        this.state = State.rejected;
         if (this.onRejected != null)
           this.onRejected (reason);
         if (this.onFinally != null)
