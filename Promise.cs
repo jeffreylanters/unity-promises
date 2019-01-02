@@ -6,7 +6,7 @@ public class Promise<T> {
   private Action<string> onRejected;
   private Action onFinally;
 
-  public State state = State.rejected;
+  public State state = State.pending;
 
   public enum State {
     pending,
