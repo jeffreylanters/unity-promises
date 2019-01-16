@@ -9,9 +9,11 @@ namespace UnityPackages {
     private static PromiseTicker _Enumerator;
     private static PromiseTicker Enumerator {
       get {
-        if (_Enumerator == null)
+        if (_Enumerator == null) {
           _Enumerator = new GameObject ("~promise")
-          .AddComponent<PromiseTicker> ();
+            .AddComponent<PromiseTicker> ();
+          GameObject.DontDestroyOnLoad (_Enumerator);
+        }
         return _Enumerator;
       }
     }
