@@ -8,9 +8,11 @@ A Promise is a proxy for a value not necessarily known when the promise is creat
 
 ## Install
 
-```sh
-$ git submodule add https://github.com/unity-packages/promise Assets/packages/promise
 ```
+"com.unity-packages.promise": "git+https://github.com/unity-packages/promise"
+```
+
+[Click here to read the Unity Packages installation guide](https://github.com/unity-packages/installation)
 
 ## Usage
 
