@@ -5,51 +5,32 @@ using UnityEngine;
 namespace UnityPackages {
 
   public class Promise<T> {
-
-    private static PromiseTicker _Enumerator;
-    private static PromiseTicker Enumerator {
-      get {
-        if (_Enumerator == null) {
-          _Enumerator = new GameObject ("~promise")
-            .AddComponent<PromiseTicker> ();
-          GameObject.DontDestroyOnLoad (_Enumerator);
-        }
-        return _Enumerator;
-      }
-    }
-
     private Action<Action<T>, Action<string>> executor;
     private Action<T> onFulfilled;
     private Action<string> onRejected;
     private Action onFinally;
 
-    public State state = State.pending;
-
-    public enum State {
-      pending,
-      fulfilled,
-      rejected
-    }
+    public PromiseState state = PromiseState.pending;
 
     public Promise (Action<Action<T>, Action<string>> executor) {
-      Enumerator.StartCoroutine (this.Execute (executor));
+      PromiseTicker.Enumerator.StartCoroutine (this.Execute (executor));
     }
 
     public IEnumerator Execute (Action<Action<T>, Action<string>> executor) {
       yield return null;
       executor (
         value => {
-          if (this.state != State.pending)
+          if (this.state != PromiseState.pending)
             return;
-          this.state = State.fulfilled;
+          this.state = PromiseState.fulfilled;
           if (this.onFulfilled != null)
             this.onFulfilled (value);
           if (this.onFinally != null)
             this.onFinally ();
         }, reason => {
-          if (this.state != State.pending)
+          if (this.state != PromiseState.pending)
             return;
-          this.state = State.rejected;
+          this.state = PromiseState.rejected;
           if (this.onRejected != null)
             this.onRejected (reason);
           if (this.onFinally != null)
@@ -73,9 +54,7 @@ namespace UnityPackages {
     }
 
     public void Consume () {
-      this.state = State.rejected;
+      this.state = PromiseState.rejected;
     }
   }
-
-  public class PromiseTicker : MonoBehaviour { }
 }
