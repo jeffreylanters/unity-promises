@@ -1,6 +1,6 @@
 {
   "name": "nl.elraccoone.promises",
-  "displayName": "Web Sockets",
+  "displayName": "Promises",
   "version": "1.1.0",
   "unity": "2018.3",
   "description": "Promises provide a simpler alternative for executing, composing, and managing asynchronous operations when compared to traditional callback-based approaches. They also allow you to handle asynchronous errors using approaches that are similar to synchronous try/catch."
