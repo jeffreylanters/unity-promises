@@ -1,7 +1,7 @@
 {
-  "name": "com.unity-packages.promise",
-  "displayName": "Promise",
-  "version": "1.0.0",
+  "name": "nl.elraccoone.promises",
+  "displayName": "Web Sockets",
+  "version": "1.1.0",
   "unity": "2018.3",
-  "description": "A Promise is a proxy for a value not necessarily known when the promise is created. It allows you to associate handlers with an asynchronous action's eventual success value or failure reason. This lets asynchronous methods return values like synchronous methods: instead of immediately returning the final value, the asynchronous method returns a promise to supply the value at some point in the future."
+  "description": "Promises provide a simpler alternative for executing, composing, and managing asynchronous operations when compared to traditional callback-based approaches. They also allow you to handle asynchronous errors using approaches that are similar to synchronous try/catch."
 }

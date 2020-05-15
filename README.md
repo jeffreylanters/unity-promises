@@ -1,25 +1,45 @@
-# Promise
+<div align="center">
 
-![](https://img.shields.io/badge/dependencies-unity--packages-%233bc6d8.svg) ![](https://img.shields.io/badge/license-MIT-%23ecc531.svg)
+<img src="https://raw.githubusercontent.com/elraccoone/unity-promises/master/.github/WIKI/logo.jpg" height="100px"></br>
 
-A Promise is a proxy for a value not necessarily known when the promise is created. It allows you to associate handlers with an asynchronous action's eventual success value or failure reason. This lets asynchronous methods return values like synchronous methods: instead of immediately returning the final value, the asynchronous method returns a promise to supply the value at some point in the future.
+# Web Sockets
 
-> NOTE When using this Unity Package, make sure to **Star** this repository. When using any of the packages please make sure to give credits to **Jeffrey Lanters** somewhere in your app or game. **THESE PACKAGES ARE NOT ALLOWED TO BE SOLD ANYWHERE!**
+[![npm](https://img.shields.io/badge/upm-1.1.0-232c37.svg?style=for-the-badge)]()
+[![license](https://img.shields.io/badge/license-Custom-%23ecc531.svg?style=for-the-badge)](./LICENSE.md)
+[![npm](https://img.shields.io/badge/sponsor-donate-E12C9A.svg?style=for-the-badge)](https://paypal.me/jeffreylanters)
+[![npm](https://img.shields.io/github/stars/elraccoone/unity-promises.svg?style=for-the-badge)]()
 
-## Install
+Promises provide a simpler alternative for executing, composing, and managing asynchronous operations when compared to traditional callback-based approaches. They also allow you to handle asynchronous errors using approaches that are similar to synchronous try/catch.
 
+When using this Unity Package, make sure to **Star** this repository. When using any of the packages please make sure to give credits to **Jeffrey Lanters / El Raccoone** somewhere in your app or game. **It it prohibited to distribute, sublicense, and/or sell copies of the Software!**
+
+**&Lt;**
+[**Installation**](#installation) &middot;
+[**Documentation**](#documentation) &middot;
+[**License**](./LICENSE.md) &middot;
+[**Sponsor**](https://paypal.me/jeffreylanters)
+**&Gt;**
+
+**Made with &hearts; by Jeffrey Lanters**
+
+</div>
+
+## Installation
+
+Install using the Unity Package Manager. add the following line to your `manifest.json` file located within your project's packages directory.
+
+```json
+"nl.elraccoone.promises": "git+https://github.com/elraccoone/unity-promises"
 ```
-"com.unity-packages.promise": "git+https://github.com/unity-packages/promise"
-```
 
-[Click here to read the Unity Packages installation guide](https://github.com/unity-packages/installation)
-
-## Usage
+## Documentation
 
 #### Syntax
 
 ```cs
-new Promise( /* executor */ ((resolve, reject) => { ... }) );
+new Promise(((resolve, reject) => { ... }) );
+new Promise<T>(((resolve, reject) => { ... }) );
+new Promise(ienumerator);
 ```
 
 A function that is passed with the arguments resolve and reject. The executor function is executed immediately by the Promise implementation, passing resolve and reject functions (the executor is called before the Promise constructor even returns the created object). The resolve and reject functions, when called, resolve or reject the promise, respectively. The executor normally initiates some asynchronous work, and then, once that completes, either calls the resolve function to resolve the promise or else rejects it if an error occurred. If an error is thrown in the executor function, the promise is rejected. The return value of the executor is ignored.
@@ -41,13 +61,28 @@ A pending promise can either be fulfilled with a value, or rejected with a reaso
 A Promise object is created using the new keyword and its constructor. This constructor takes as its argument a function, called the "executor function". This function should take two functions as parameters. The first of these functions (resolve) is called when the asynchronous task completes successfully and returns the results of the task as a value. The second (reject) is called when the task fails, and returns the reason for failure, which is typically an error object.
 
 ```cs
-var myNewPromise = new Promise<bool> ((resolve, reject) => {
-  // do something asynchronous which eventually calls either:
-  //
-  //   resolve(someValue); // fulfilled
-  // or
-  //   reject("failure reason"); // rejected
-});
+public Promise<int> LoadSomeData () {
+  return new Promise<int> ((resolve, reject) => {
+    // do something asynchronous which eventually calls either:
+    //   resolve(someValue); // fulfilled
+    // or
+    //   reject("failure reason"); // rejected
+  });
+}
+
+public Promise LoadSomeData () {
+  return new Promise ((resolve, reject) => {
+    // do something asynchronous which eventually calls either:
+    //   resolve(); // fulfilled
+    // or
+    //   reject("failure reason"); // rejected
+  });
+}
+
+
+public Promise LoadSomeData () {
+  return new Promise (someCoroutine());
+}
 ```
 
 #### Using a Promise
@@ -56,16 +91,9 @@ Execute your function and return a promise. You can use the Promise.Then() and P
 
 ```cs
 public void Awake () {
-  this.LoadData()
+  this.LoadSomeData()
     .Then(num => { /* ... */ })
     .Catch(reason => { /* ... */ })
     .Finally(() => { /* ... */ });
-}
-
-public Promise<int> LoadData () {
-  return new Promise<int> ((resolve, reject) => {
-    // Do something async...
-    resolve(100);
-  });
 }
 ```

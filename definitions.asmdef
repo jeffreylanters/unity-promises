@@ -1,5 +1,5 @@
 {
-    "name": "unity-packages.promise",
+    "name": "nl.elraccoone.promises",
     "references": [],
     "optionalUnityReferences": [],
     "includePlatforms": [],

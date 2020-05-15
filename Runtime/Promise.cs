@@ -1,8 +1,8 @@
 using System;
 using System.Collections;
-using UnityEngine;
+using ElRaccoone.Promises.Core;
 
-namespace UnityPackages {
+namespace ElRaccoone.Promises {
 
   public class Promise {
     private Action<Action, Action<string>> executor;
@@ -13,7 +13,7 @@ namespace UnityPackages {
     public PromiseState state = PromiseState.pending;
 
     public Promise (Action<Action, Action<string>> executor) {
-      PromiseTicker.Enumerator.StartCoroutine (this.Execute (executor));
+      PromiseTicker.enumerator.StartCoroutine (this.Execute (executor));
     }
 
     public IEnumerator Execute (Action<Action, Action<string>> executor) {
