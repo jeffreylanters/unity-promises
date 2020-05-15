@@ -30,14 +30,13 @@ namespace ElRaccoone.Promises.Tests {
       });
     }
 
-    private PromiseEnumerator Test_WithEnumerator () {
-      return new PromiseEnumerator (this.WaitCoroutine ());
+    private Promise Test_WithEnumerator () {
+      return new Promise (this.WaitCoroutine ());
     }
     private IEnumerator WaitCoroutine () {
       Debug.Log ("...Uno...");
       yield return new WaitForSeconds (1);
       Debug.Log ("...Dos...");
-      throw new System.Exception ("WOOPS");
     }
   }
 }

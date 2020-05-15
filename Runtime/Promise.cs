@@ -16,6 +16,10 @@ namespace ElRaccoone.Promises {
       PromiseTicker.enumerator.StartCoroutine (this.Execute (executor));
     }
 
+    public Promise (IEnumerator enumerator) {
+      PromiseTicker.enumerator.StartCoroutine (this.Execute (enumerator));
+    }
+
     private IEnumerator Execute (Action<Action, Action<string>> executor) {
       yield return null;
       executor (
@@ -37,6 +41,23 @@ namespace ElRaccoone.Promises {
           if (this.onFinally != null)
             this.onFinally ();
         });
+    }
+
+    private IEnumerator Execute (IEnumerator enumerator) {
+      try {
+        yield return enumerator;
+        this.state = PromiseState.Fulfilled;
+        if (this.onFulfilled != null)
+          this.onFulfilled ();
+      } finally {
+        if (this.state != PromiseState.Fulfilled) {
+          this.state = PromiseState.Rejected;
+          if (this.onRejected != null)
+            this.onRejected ("Enumator did not fulfill");
+        }
+        if (this.onFinally != null)
+          this.onFinally ();
+      }
     }
 
     public Promise Then (Action onFulfilled) {
