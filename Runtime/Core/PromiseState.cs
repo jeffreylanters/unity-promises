@@ -1,7 +1,7 @@
 namespace ElRaccoone.Promises.Core {
   public enum PromiseState {
-    pending,
-    fulfilled,
-    rejected
+    Pending = 0,
+    Fulfilled = 1,
+    Rejected = 2
   }
 }

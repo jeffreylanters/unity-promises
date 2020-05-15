@@ -1,13 +1,14 @@
 using UnityEngine;
 
 namespace ElRaccoone.Promises.Core {
-  public class PromiseTicker : MonoBehaviour {
-    private static PromiseTicker _enumerator;
-    public static PromiseTicker enumerator {
+  public static class PromiseTicker {
+    public class DummyBehaviour : MonoBehaviour { }
+    private static DummyBehaviour _enumerator;
+    public static DummyBehaviour enumerator {
       get {
         if (_enumerator == null) {
-          _enumerator = new GameObject ("~promise")
-            .AddComponent<PromiseTicker> ();
+          _enumerator = new GameObject ("~promises")
+            .AddComponent<DummyBehaviour> ();
           Object.DontDestroyOnLoad (_enumerator);
         }
         return _enumerator;

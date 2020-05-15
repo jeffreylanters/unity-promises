@@ -37,9 +37,9 @@ Install using the Unity Package Manager. add the following line to your `manifes
 #### Syntax
 
 ```cs
-new Promise(((resolve, reject) => { ... }) );
-new Promise<T>(((resolve, reject) => { ... }) );
-new Promise(ienumerator);
+new Promise(((resolve, reject) => { /* ... */ }) );
+new Promise<T>(((resolve, reject) => { /* ... */ }) );
+new PromiseEnumerator(enumerator);
 ```
 
 A function that is passed with the arguments resolve and reject. The executor function is executed immediately by the Promise implementation, passing resolve and reject functions (the executor is called before the Promise constructor even returns the created object). The resolve and reject functions, when called, resolve or reject the promise, respectively. The executor normally initiates some asynchronous work, and then, once that completes, either calls the resolve function to resolve the promise or else rejects it if an error occurred. If an error is thrown in the executor function, the promise is rejected. The return value of the executor is ignored.
@@ -80,9 +80,10 @@ public Promise LoadSomeData () {
 }
 
 
-public Promise LoadSomeData () {
-  return new Promise (someCoroutine());
+public PromiseEnumerator LoadSomeData () {
+  return new PromiseEnumerator (LoadDataCoroutine());
 }
+public IEnumerator LoadDataCoroutine () { /* ... */ }
 ```
 
 #### Using a Promise
