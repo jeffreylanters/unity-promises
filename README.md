@@ -4,7 +4,7 @@
 
 # Promises
 
-[![npm](https://img.shields.io/badge/upm-1.1.0-232c37.svg?style=for-the-badge)]()
+[![npm](https://img.shields.io/badge/upm-1.2.0-232c37.svg?style=for-the-badge)]()
 [![license](https://img.shields.io/badge/license-Custom-%23ecc531.svg?style=for-the-badge)](./LICENSE.md)
 [![npm](https://img.shields.io/badge/sponsor-donate-E12C9A.svg?style=for-the-badge)](https://paypal.me/jeffreylanters)
 [![npm](https://img.shields.io/github/stars/elraccoone/unity-promises.svg?style=for-the-badge)]()
@@ -37,7 +37,9 @@ Install using the Unity Package Manager. add the following line to your `manifes
 ## Syntax
 
 ```cs
+new Promise(((resolve) => { /* ... */ }) );
 new Promise(((resolve, reject) => { /* ... */ }) );
+new Promise<T>(((resolve) => { /* ... */ }) );
 new Promise<T>(((resolve, reject) => { /* ... */ }) );
 new Promise(enumerator);
 ```
@@ -62,6 +64,8 @@ A Promise object is created using the new keyword and its constructor. This cons
 
 ```cs
 public Promise<int> LoadSomeData () {
+  // Return a new generic promise and assign the executor.
+  // The reject overload is optional!
   return new Promise<int> ((resolve, reject) => {
     // do something asynchronous which eventually calls either:
     //   resolve(someValue); // fulfilled
@@ -71,6 +75,8 @@ public Promise<int> LoadSomeData () {
 }
 
 public Promise LoadSomeData () {
+  // Return a new void promise and assign the executor.
+  // The reject overload is optional!
   return new Promise ((resolve, reject) => {
     // do something asynchronous which eventually calls either:
     //   resolve(); // fulfilled

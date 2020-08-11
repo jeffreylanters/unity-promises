@@ -16,6 +16,10 @@ namespace ElRaccoone.Promises {
       PromiseTicker.enumerator.StartCoroutine (this.Execute (executor));
     }
 
+    public Promise (Action<Action<T>> executor) {
+      PromiseTicker.enumerator.StartCoroutine (this.Execute (executor));
+    }
+
     private IEnumerator Execute (Action<Action<T>, Action<string>> executor) {
       yield return null;
       executor (
@@ -33,6 +37,20 @@ namespace ElRaccoone.Promises {
           this.state = PromiseState.Rejected;
           if (this.onRejected != null)
             this.onRejected (reason);
+          if (this.onFinally != null)
+            this.onFinally ();
+        });
+    }
+
+    private IEnumerator Execute (Action<Action<T>> executor) {
+      yield return null;
+      executor (
+        value => {
+          if (this.state != PromiseState.Pending)
+            return;
+          this.state = PromiseState.Fulfilled;
+          if (this.onFulfilled != null)
+            this.onFulfilled (value);
           if (this.onFinally != null)
             this.onFinally ();
         });
