@@ -87,7 +87,7 @@ public Promise<int> LoadSomeData () {
   // The reject overload is optional!
   return new Promise<int> ((resolve, reject) => {
     // do something asynchronous which eventually calls either:
-    //   resolve(someValue); // fulfilled
+    //   resolve(100); // fulfilled
     //   reject("failure reason"); // or rejected
   });
 }
@@ -97,8 +97,8 @@ public Promise<int> LoadSomeData () {
   // executor.
   return new Promise<int, bool> ((resolve, reject) => {
     // do something asynchronous which eventually calls either:
-    //   resolve(someValue); // fulfilled
-    //   reject("failure reason"); // or rejected
+    //   resolve(100); // fulfilled
+    //   reject(false); // or rejected
   });
 }
 
