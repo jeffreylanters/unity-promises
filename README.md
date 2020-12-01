@@ -92,7 +92,7 @@ public Promise<int> LoadSomeData () {
   });
 }
 
-public Promise<int> LoadSomeData () {
+public Promise<int, bool> LoadSomeData () {
   // Return a new promise with a generic resolve and reject type and assign the
   // executor.
   return new Promise<int, bool> ((resolve, reject) => {
