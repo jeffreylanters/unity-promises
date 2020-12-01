@@ -6,7 +6,7 @@
 
 # Promises
 
-[![npm](https://img.shields.io/badge/upm-1.2.0-232c37.svg?style=for-the-badge)]()
+[![npm](https://img.shields.io/badge/upm-1.3.0-232c37.svg?style=for-the-badge)]()
 [![npm](https://img.shields.io/github/stars/elraccoone/unity-promises.svg?style=for-the-badge)]()
 [![npm](https://img.shields.io/badge/build-passing-brightgreen.svg?style=for-the-badge)]()
 
@@ -47,8 +47,9 @@ Install the latest stable release using the Unity Package Manager by adding the 
 ```cs
 new Promise(((resolve) => { /* ... */ }) );
 new Promise(((resolve, reject) => { /* ... */ }) );
-new Promise<T>(((resolve) => { /* ... */ }) );
-new Promise<T>(((resolve, reject) => { /* ... */ }) );
+new Promise<ResolveType>(((resolve) => { /* ... */ }) );
+new Promise<ResolveType>(((resolve, reject) => { /* ... */ }) );
+new Promise<ResolveType, RejectType>(((resolve, reject) => { /* ... */ }) );
 new Promise(enumerator);
 ```
 
@@ -71,30 +72,39 @@ A pending promise can either be fulfilled with a value, or rejected with a reaso
 A Promise object is created using the new keyword and its constructor. This constructor takes as its argument a function, called the "executor function". This function should take two functions as parameters. The first of these functions (resolve) is called when the asynchronous task completes successfully and returns the results of the task as a value. The second (reject) is called when the task fails, and returns the reason for failure, which is typically an error object.
 
 ```cs
+public Promise LoadSomeData () {
+  // Return a new void promise and assign the executor. The reject overload is
+  // optional!
+  return new Promise ((resolve, reject) => {
+    // do something asynchronous which eventually calls either:
+    //   resolve(); // fulfilled
+    //   reject("failure reason"); // or rejected
+  });
+}
+
 public Promise<int> LoadSomeData () {
-  // Return a new generic promise and assign the executor.
+  // Return a new promise with a generic resolve type and assign the executor.
   // The reject overload is optional!
   return new Promise<int> ((resolve, reject) => {
     // do something asynchronous which eventually calls either:
     //   resolve(someValue); // fulfilled
-    // or
-    //   reject("failure reason"); // rejected
+    //   reject("failure reason"); // or rejected
   });
 }
 
-public Promise LoadSomeData () {
-  // Return a new void promise and assign the executor.
-  // The reject overload is optional!
-  return new Promise ((resolve, reject) => {
+public Promise<int> LoadSomeData () {
+  // Return a new promise with a generic resolve and reject type and assign the
+  // executor.
+  return new Promise<int, bool> ((resolve, reject) => {
     // do something asynchronous which eventually calls either:
-    //   resolve(); // fulfilled
-    // or
-    //   reject("failure reason"); // rejected
+    //   resolve(someValue); // fulfilled
+    //   reject("failure reason"); // or rejected
   });
 }
 
-
 public Promise LoadSomeData () {
+  // Return a new promise with a coroutine, the routine will be executed
+  // automatically and will resolve when completed.
   return new Promise (LoadDataCoroutine());
 }
 ```
