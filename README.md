@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://raw.githubusercontent.com/elraccoone/unity-promises/master/.github/WIKI/logo.jpg" height="100px">
+<img src="https://raw.githubusercontent.com/elraccoone/unity-promises/master/.github/WIKI/logo-transparent.png" height="100px">
 
 </br>
 
