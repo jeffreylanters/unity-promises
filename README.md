@@ -6,9 +6,9 @@
 
 # Promises
 
-[![npm](https://img.shields.io/badge/upm-1.3.0-232c37.svg?style=for-the-badge)]()
-[![npm](https://img.shields.io/github/stars/elraccoone/unity-promises.svg?style=for-the-badge)]()
-[![npm](https://img.shields.io/badge/build-passing-brightgreen.svg?style=for-the-badge)]()
+[![openupm](https://img.shields.io/npm/v/nl.elraccoone.promises?label=UPM&registry_uri=https://package.openupm.com&style=for-the-badge&color=232c37)](https://openupm.com/packages/nl.elraccoone.promises/)
+[![](https://img.shields.io/github/stars/elraccoone/unity-promises.svg?style=for-the-badge)]()
+[![](https://img.shields.io/badge/build-passing-brightgreen.svg?style=for-the-badge)]()
 
 Promises provide a simpler alternative for executing, composing, and managing asynchronous operations when compared to traditional callback-based approaches. They also allow you to handle asynchronous errors using approaches that are similar to synchronous try/catch.
 
