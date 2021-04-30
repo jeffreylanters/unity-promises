@@ -4,7 +4,7 @@ using ElRaccoone.Promises.Core;
 
 namespace ElRaccoone.Promises {
 
-  /// Promise without any resolve parameter.
+  /// Promise without any parameter types.
   public class Promise {
     private Action<Action, Action<string>> executor;
     private Action onFulfilled;
