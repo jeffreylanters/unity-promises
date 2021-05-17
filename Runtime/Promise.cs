@@ -164,7 +164,7 @@ namespace ElRaccoone.Promises {
       while (this.state == State.Pending)
         await Task.Delay (1);
       if (this.state == State.Rejected)
-        throw new Exception (this.rejectValue.ToString ());
+        throw this.rejectValue;
       return this.resolveValue;
     }
   }
