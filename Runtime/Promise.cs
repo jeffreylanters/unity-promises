@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Threading.Tasks;
 using ElRaccoone.Promises.Core;
 
@@ -90,7 +89,7 @@ namespace ElRaccoone.Promises {
     /// </summary>
     /// <param name="executor">Callback method containing the resolve method.</param>
     public Promise (Action<Action<ResolveType>> executor) {
-      PromiseTicker.enumerator.StartCoroutine (this.Execute (executor));
+      this.Execute (executor);
     }
 
     /// <summary>
@@ -98,7 +97,7 @@ namespace ElRaccoone.Promises {
     /// </summary>
     /// <param name="executor">Callback method containing the resolve and reject methods.</param>
     public Promise (Action<Action<ResolveType>, Action<RejectType>> executor) {
-      PromiseTicker.enumerator.StartCoroutine (this.Execute (executor));
+      this.Execute (executor);
     }
 
     /// <summary>
@@ -106,8 +105,8 @@ namespace ElRaccoone.Promises {
     /// </summary>
     /// <param name="executor">The promise executor.</param>
     /// <returns>A couritine sleeping one frame allowing to set callbacks.</returns>
-    private IEnumerator Execute (Action<Action<ResolveType>> executor) {
-      yield return null;
+    private async void Execute (Action<Action<ResolveType>> executor) {
+      await Task.Yield ();
       executor (this.ExecuteResolver);
     }
 
@@ -116,8 +115,8 @@ namespace ElRaccoone.Promises {
     /// </summary>
     /// <param name="executor">The promise executor.</param>
     /// <returns>A couritine sleeping one frame allowing to set callbacks.</returns>
-    private IEnumerator Execute (Action<Action<ResolveType>, Action<RejectType>> executor) {
-      yield return null;
+    private async void Execute (Action<Action<ResolveType>, Action<RejectType>> executor) {
+      await Task.Yield ();
       executor (this.ExecuteResolver, this.ExecuteRejector);
     }
 
