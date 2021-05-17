@@ -6,24 +6,6 @@ using System.Threading.Tasks;
 
 namespace ElRaccoone.Promises {
 
-  // /// <summary>
-  // /// A promise without a value.
-  // /// </summary>
-  // public class Promise : Promise<ResolveType, RejectType> {
-
-  //   /// <summary>
-  //   /// Instantiates a new promise with an executor to either resolve or reject.
-  //   /// </summary>
-  //   /// <param name="executor">Callback method containing the resolve and reject methods.</param>
-  //   public Promise (Action<Action, Action<RejectType>> executor) : base (executor) { }
-
-  //   /// <summary>
-  //   /// Instantiates a new promise with an executor to resolve.
-  //   /// </summary>
-  //   /// <param name="executor">Callback method containing the resolve method.</param>
-  //   public Promise (Action<Action<ResolveType>> executor) : base (executor) { }
-  // }
-
   /// <summary>
   /// A promise with a generic resolve type.
   /// </summary>
@@ -45,7 +27,7 @@ namespace ElRaccoone.Promises {
   }
 
   /// <summary>
-  /// A promise with a generic value parameter and exception type.
+  /// A promise with a generic resolve and reject type.
   /// </summary>
   /// <typeparam name="ResolveType">The type of the resolver's value.</typeparam>
   /// <typeparam name="RejectType">the type of the rejector's value.</typeparam>
