@@ -34,12 +34,12 @@ namespace ElRaccoone.Promises {
   public class Promise<ResolveType, RejectType> where RejectType : Exception {
 
     /// <summary>
-    /// Optional callback for when the promise resolves with a paramter.
+    /// Optional callback for when the promise resolves with a parameter.
     /// </summary>
-    private Action<ResolveType> onResolveWithParameter;
+    private Action<ResolveType> onResolve;
 
     /// <summary>
-    /// Optional callback for when the promise resolves without a paramter.
+    /// Optional callback for when the promise resolves without a parameter.
     /// </summary>
     private Action onResolveWithoutParameter;
 
@@ -134,21 +134,8 @@ namespace ElRaccoone.Promises {
         return;
       this.state = State.Fulfilled;
       this.resolveValue = value;
-      if (this.onResolveWithoutParameter != null)
-        this.onResolveWithoutParameter ();
-      if (this.onResolveWithParameter != null)
-        this.onResolveWithParameter (value);
-      if (this.onFinally != null)
-        this.onFinally ();
-    }
-
-    /// <summary>
-    /// Invokes the executor's resolver method without a parameter.
-    /// </summary>
-    private void ExecuteResolver () {
-      if (this.state != State.Pending)
-        return;
-      this.state = State.Fulfilled;
+      if (this.onResolve != null)
+        this.onResolve (value);
       if (this.onResolveWithoutParameter != null)
         this.onResolveWithoutParameter ();
       if (this.onFinally != null)
@@ -156,7 +143,7 @@ namespace ElRaccoone.Promises {
     }
 
     /// <summary>
-    /// Invokes the executor's rejector method.
+    /// Invokes the executor's rejector method with an exception.
     /// </summary>
     /// <param name="exception">The exception.</param>
     private void ExecuteRejector (RejectType exception) {
@@ -186,7 +173,7 @@ namespace ElRaccoone.Promises {
     /// <param name="onResolve">The resolver callback.</param>
     /// <returns>The promise.</returns>
     public Promise<ResolveType, RejectType> Then (Action<ResolveType> onResolve) {
-      this.onResolveWithParameter = onResolve;
+      this.onResolve = onResolve;
       return this;
     }
 
