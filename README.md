@@ -121,7 +121,7 @@ public void Start () {
 }
 ```
 
-### Using Async/Await method
+### Using Async/Await methods
 
 When chaining multiple promises after one another or when simply wanting to prevent a lot of nested callbacks, use the async await logic to keep things simple. There are two ways of doing so, the simplest way does not require any changes on the promise's creation side. A basic implementation could be as following.
 
