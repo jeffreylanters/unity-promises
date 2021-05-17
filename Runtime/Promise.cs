@@ -93,7 +93,7 @@ namespace ElRaccoone.Promises {
       /// <summary>
       /// The operation failed.
       /// </summary>
-      Rejected = 2
+      Rejected = 2,
     }
 
     /// <summary>
@@ -214,13 +214,6 @@ namespace ElRaccoone.Promises {
     }
 
     /// <summary>
-    /// Consumes the promise, the executor will no longer invoke any callback.
-    /// </summary>
-    public void Consume () {
-      this.state = State.Rejected;
-    }
-
-    /// <summary>
     /// Awaits the promise.
     /// </summary>
     /// <returns>A task containing the resolved value.</returns>
@@ -229,7 +222,8 @@ namespace ElRaccoone.Promises {
         await Task.Yield ();
       if (this.state == State.Rejected)
         throw this.rejectedValue;
-      return this.resolvedValue;
+      else if (this.state == State.Resolved)
+        return this.resolvedValue;
     }
   }
 }
