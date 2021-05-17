@@ -15,13 +15,13 @@ namespace ElRaccoone.Promises.Tests {
     /// Draws the tester gui.
     /// </summary>
     private void OnGUI () {
-      if (GUILayout.Button ("Test 1: Promise With Generic Resolve Type Using Callbacks"))
+      if (GUILayout.Button ("[TEST 1]: Promise With Generic Resolve Type Using Callbacks"))
         this.RunTest1 ();
-      if (GUILayout.Button ("Test 2: Promise With Generic Resolve Type Using Async/Await"))
+      if (GUILayout.Button ("[TEST 2]: Promise With Generic Resolve Type Using Async/Await"))
         this.RunTest2 ();
-      if (GUILayout.Button ("Test 3: Promise With Generic Resolve And Reject Type Using Callbacks"))
+      if (GUILayout.Button ("[TEST 3]: Promise With Generic Resolve And Reject Type Using Callbacks"))
         this.RunTest3 ();
-      if (GUILayout.Button ("Test 4: Promise With Generic Resolve And Reject Type Using Async/Await"))
+      if (GUILayout.Button ("[TEST 4]: Promise With Generic Resolve And Reject Type Using Async/Await"))
         this.RunTest4 ();
     }
 
@@ -29,57 +29,73 @@ namespace ElRaccoone.Promises.Tests {
     /// Runs test 1.
     /// </summary>
     private void RunTest1 () {
-      Debug.Log ("Test 1: Running...");
-      this.GetRandomNumber ()
-        .Then (value => Debug.Log ($"Test 1: Resolved with value: {value}"))
-        .Catch (exception => Debug.LogError ($"Test 1: Rejected with exception: {exception}"))
-        .Finally (() => Debug.Log ("Test 1: Finalized!"));
+      Debug.Log ("[TEST 1]: Running...");
+      this.GetRandomNumberPromise ()
+        .Then (value => Debug.Log ($"[TEST 1]: Resolved with value: {value}"))
+        .Catch (exception => Debug.LogError ($"[TEST 1]: Rejected with exception: {exception}"))
+        .Finally (() => Debug.Log ("[TEST 1]: Finalized!"));
     }
 
     /// <summary>
     /// Runs test 2.
     /// </summary>
     private async void RunTest2 () {
-      Debug.Log ("Test 2: Running...");
+      Debug.Log ("[TEST 2]: Running...");
       try {
-        var value = await this.GetRandomNumber ().Async ();
-        Debug.Log ($"Test 2: Resolved with value: {value}");
+        var value = await this.GetRandomNumberPromise ().Async ();
+        Debug.Log ($"[TEST 2]: Resolved with value: {value}");
       } catch (Exception exception) {
-        Debug.LogError ($"Test 2: Rejected with exception: {exception}");
+        Debug.LogError ($"[TEST 2]: Rejected with exception: {exception}");
       }
-      Debug.Log ("Test 2: Finalized!");
+      Debug.Log ("[TEST 2]: Finalized!");
     }
 
     /// <summary>
     /// Runs test 3.
     /// </summary>
     private void RunTest3 () {
-      Debug.Log ("Test 3: Running...");
+      Debug.Log ("[TEST 3]: Running...");
       this.GetRandomNumberWithCustomException ()
-        .Then (value => Debug.Log ($"Test 3: Resolved with value: {value}"))
-        .Catch (exception => Debug.LogError ($"Test 3: Rejected with custom exception: {exception.number}"))
-        .Finally (() => Debug.Log ("Test 3: Finalized!"));
+        .Then (value => Debug.Log ($"[TEST 3]: Resolved with value: {value}"))
+        .Catch (exception => Debug.LogError ($"[TEST 3]: Rejected with custom exception: {exception.number}"))
+        .Finally (() => Debug.Log ("[TEST 3]: Finalized!"));
     }
 
     /// <summary>
     /// Runs test 4.
     /// </summary>
     private async void RunTest4 () {
-      Debug.Log ("Test 4: Running...");
+      Debug.Log ("[TEST 4]: Running...");
       try {
         var value = await this.GetRandomNumberWithCustomException ().Async ();
-        Debug.Log ($"Test 4: Resolved with value: {value}");
+        Debug.Log ($"[TEST 4]: Resolved with value: {value}");
       } catch (CustomException exception) {
-        Debug.LogError ($"Test 4: Rejected with custom exception: {exception.number}");
+        Debug.LogError ($"[TEST 4]: Rejected with custom exception: {exception.number}");
       }
-      Debug.Log ("Test 4: Finalized!");
+      Debug.Log ("[TEST 4]: Finalized!");
     }
+
+    // /// <summary>
+    // /// Returns a random number between 0 and 100.
+    // /// </summary>
+    // /// <returns>A promise containing the number.</returns>
+    // private Promise EmptyPromise () {
+    //   return new Promise ((resolve, reject) => {
+    //     this.StartCoroutine (this.GetRandomNumberRoutine (randomNumber => {
+    //       if (randomNumber > 25) {
+    //         resolve (randomNumber);
+    //       } else {
+    //         reject (new Exception ($"Something went wrong {randomNumber}"));
+    //       }
+    //     }));
+    //   });
+    // }
 
     /// <summary>
     /// Returns a random number between 0 and 100.
     /// </summary>
     /// <returns>A promise containing the number.</returns>
-    private Promise<int> GetRandomNumber () {
+    private Promise<int> GetRandomNumberPromise () {
       return new Promise<int> ((resolve, reject) => {
         this.StartCoroutine (this.GetRandomNumberRoutine (randomNumber => {
           if (randomNumber > 25) {
