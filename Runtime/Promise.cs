@@ -1,6 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using ElRaccoone.Promises.Core;
 
 // TODO add typeless Promise
 // TODO add enumatable Promise
