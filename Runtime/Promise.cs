@@ -3,6 +3,10 @@ using System.Collections;
 using System.Threading.Tasks;
 using ElRaccoone.Promises.Core;
 
+// TODO add typeless Promise
+// TODO add enumatable Promise
+// TODO add overload without rejector
+
 namespace ElRaccoone.Promises {
 
   /// <summary>
