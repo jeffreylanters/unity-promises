@@ -34,34 +34,34 @@ namespace ElRaccoone.Promises {
   public class Promise<ResolveType, RejectType> where RejectType : Exception {
 
     /// <summary>
-    /// Optional callback for when the promise resolves with a parameter.
+    /// Optional callback for when the promise resolves with a generic.
     /// </summary>
-    private Action<ResolveType> onResolve;
+    private Action<ResolveType> onGenericResolveCallback;
 
     /// <summary>
-    /// Optional callback for when the promise resolves without a parameter.
+    /// Optional callback for when the promise resolves.
     /// </summary>
-    private Action onResolveWithoutParameter;
+    private Action onResolveCallback;
 
     /// <summary>
-    /// Optional callback for when the promise rejects.
+    /// Optional callback for when the promise rejects with a generic.
     /// </summary>
-    private Action<RejectType> onRejected;
+    private Action<RejectType> onGenericRejectedCallback;
 
     /// <summary>
-    /// Optional callback for when the promise ends.
+    /// Optional callback for when the promise finalizes.
     /// </summary>
-    private Action onFinally;
-
-    /// <summary>
-    /// 
-    /// </summary>
-    private ResolveType resolveValue;
+    private Action onFinallyCallback;
 
     /// <summary>
     /// 
     /// </summary>
-    private RejectType rejectValue;
+    private ResolveType resolvedValue;
+
+    /// <summary>
+    /// 
+    /// </summary>
+    private RejectType rejectedValue;
 
     /// <summary>
     /// The state of the promise.
@@ -69,7 +69,7 @@ namespace ElRaccoone.Promises {
     public State state { get; private set; } = State.Pending;
 
     /// <summary>
-    /// Defines the state of the promise.
+    /// Promise states.
     /// </summary>
     public enum State {
 
@@ -90,110 +90,137 @@ namespace ElRaccoone.Promises {
     }
 
     /// <summary>
-    /// Instantiates a new promise with an executor to resolve.
+    /// Instantiates a new promise with an executor consisting a resolver.
     /// </summary>
-    /// <param name="executor">Callback method containing the resolve method.</param>
+    /// <param name="executor">The executor.</param>
+    public Promise (Action<Action> executor) {
+      this.Execute (executor);
+    }
+
+    /// <summary>
+    /// Instantiates a new promise with an executor consisting a generic resolver.
+    /// </summary>
+    /// <param name="executor">The executor.</param>
     public Promise (Action<Action<ResolveType>> executor) {
       this.Execute (executor);
     }
 
     /// <summary>
-    /// Instantiates a new promise with an executor to either resolve or reject.
+    /// Instantiates a new promise with an executor consisting a generic resolver and generic rejector.
     /// </summary>
-    /// <param name="executor">Callback method containing the resolve and reject methods.</param>
+    /// <param name="executor">The executor.</param>
     public Promise (Action<Action<ResolveType>, Action<RejectType>> executor) {
       this.Execute (executor);
     }
 
     /// <summary>
-    /// Executes the promise with just a resolver.
+    /// Executes the promise with a resolver.
     /// </summary>
-    /// <param name="executor">The promise executor.</param>
-    /// <returns>A couritine sleeping one frame allowing to set callbacks.</returns>
-    private async void Execute (Action<Action<ResolveType>> executor) {
+    /// <param name="executor">The executor.</param>
+    private async void Execute (Action<Action> executor) {
       await Task.Yield ();
       executor (this.ExecuteResolver);
     }
 
     /// <summary>
-    /// Executes the promise with a resolver and rejector.
+    /// Executes the promise with a generic resolver.
     /// </summary>
-    /// <param name="executor">The promise executor.</param>
-    /// <returns>A couritine sleeping one frame allowing to set callbacks.</returns>
-    private async void Execute (Action<Action<ResolveType>, Action<RejectType>> executor) {
+    /// <param name="executor">The executor.</param>
+    private async void Execute (Action<Action<ResolveType>> executor) {
       await Task.Yield ();
-      executor (this.ExecuteResolver, this.ExecuteRejector);
+      executor (this.ExecuteResolve);
     }
 
     /// <summary>
-    /// Invokes the executor's resolver method with a parameter.
+    /// Executes the promise with a generic resolver and generic rejector.
     /// </summary>
-    /// <param name="value">The resolver value.</param>
-    private void ExecuteResolver (ResolveType value) {
+    /// <param name="executor">The executor.</param>
+    private async void Execute (Action<Action<ResolveType>, Action<RejectType>> executor) {
+      await Task.Yield ();
+      executor (this.ExecuteResolve, this.ExecuteReject);
+    }
+
+    /// <summary>
+    /// Invokes the executor's resolve method.
+    /// </summary>
+    private void ExecuteResolver () {
       if (this.state != State.Pending)
         return;
       this.state = State.Fulfilled;
-      this.resolveValue = value;
-      if (this.onResolve != null)
-        this.onResolve (value);
-      if (this.onResolveWithoutParameter != null)
-        this.onResolveWithoutParameter ();
-      if (this.onFinally != null)
-        this.onFinally ();
+      this.resolvedValue = value;
+      if (this.onResolveCallback != null)
+        this.onResolveCallback ();
+      if (this.onFinallyCallback != null)
+        this.onFinallyCallback ();
     }
 
     /// <summary>
-    /// Invokes the executor's rejector method with an exception.
+    /// Invokes the executor's generic resolve method.
+    /// </summary>
+    /// <param name="value">The resolver value.</param>
+    private void ExecuteResolve (ResolveType value) {
+      if (this.state != State.Pending)
+        return;
+      this.state = State.Fulfilled;
+      this.resolvedValue = value;
+      if (this.onGenericResolveCallback != null)
+        this.onGenericResolveCallback (value);
+      if (this.onFinallyCallback != null)
+        this.onFinallyCallback ();
+    }
+
+    /// <summary>
+    /// Invokes the executor's generic reject method.
     /// </summary>
     /// <param name="exception">The exception.</param>
-    private void ExecuteRejector (RejectType exception) {
+    private void ExecuteReject (RejectType exception) {
       if (this.state != State.Pending)
         return;
       this.state = State.Rejected;
-      this.rejectValue = exception;
-      if (this.onRejected != null)
-        this.onRejected (exception);
-      if (this.onFinally != null)
-        this.onFinally ();
+      this.rejectedValue = exception;
+      if (this.onGenericRejectedCallback != null)
+        this.onGenericRejectedCallback (exception);
+      if (this.onFinallyCallback != null)
+        this.onFinallyCallback ();
     }
 
     /// <summary>
-    /// Sets the resolve callback to a value without a parameter.
+    /// Sets the resolve callback.
     /// </summary>
-    /// <param name="onResolve">The resolver callback.</param>
+    /// <param name="action">The resolver callback.</param>
     /// <returns>The promise.</returns>
-    public Promise<ResolveType, RejectType> Then (Action onResolve) {
-      this.onResolveWithoutParameter = onResolve;
+    public Promise<ResolveType, RejectType> Then (Action action) {
+      this.onResolveCallback = action;
       return this;
     }
 
     /// <summary>
-    /// Sets the resolve callback to a value with a parameter.
+    /// Sets the generic resolve callback.
     /// </summary>
-    /// <param name="onResolve">The resolver callback.</param>
+    /// <param name="action">The resolver callback.</param>
     /// <returns>The promise.</returns>
-    public Promise<ResolveType, RejectType> Then (Action<ResolveType> onResolve) {
-      this.onResolve = onResolve;
+    public Promise<ResolveType, RejectType> Then (Action<ResolveType> action) {
+      this.onGenericResolveCallback = action;
       return this;
     }
 
     /// <summary>
-    /// Sets the reject callback.
+    /// Sets the generic reject callback.
     /// </summary>
-    /// <param name="onRejected">The rejection callback</param>
+    /// <param name="action">The rejection callback</param>
     /// <returns>The promise.</returns>
-    public Promise<ResolveType, RejectType> Catch (Action<RejectType> onRejected) {
-      this.onRejected = onRejected;
+    public Promise<ResolveType, RejectType> Catch (Action<RejectType> action) {
+      this.onGenericRejectedCallback = action;
       return this;
     }
 
     /// <summary>
-    /// Sets the final callback/
+    /// Sets the finalize callback.
     /// </summary>
-    /// <param name="onFinally">The final callback.</param>
+    /// <param name="action">The final callback.</param>
     /// <returns>The promise.</returns>
-    public Promise<ResolveType, RejectType> Finally (Action onFinally) {
-      this.onFinally = onFinally;
+    public Promise<ResolveType, RejectType> Finally (Action action) {
+      this.onFinallyCallback = action;
       return this;
     }
 
@@ -212,8 +239,8 @@ namespace ElRaccoone.Promises {
       while (this.state == State.Pending)
         await Task.Yield ();
       if (this.state == State.Rejected)
-        throw this.rejectValue;
-      return this.resolveValue;
+        throw this.rejectedValue;
+      return this.resolvedValue;
     }
   }
 }
