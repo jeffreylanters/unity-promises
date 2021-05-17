@@ -61,12 +61,12 @@ namespace ElRaccoone.Promises {
     private Action onFinallyCallback;
 
     /// <summary>
-    /// 
+    /// Stores the value of a resolved promise.
     /// </summary>
     private ResolveType resolvedValue;
 
     /// <summary>
-    /// 
+    /// Stores the value of a rejected promise.
     /// </summary>
     private RejectType rejectedValue;
 
@@ -221,9 +221,9 @@ namespace ElRaccoone.Promises {
     }
 
     /// <summary>
-    /// 
+    /// Awaits the promise.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>A task containing the resolved value.</returns>
     public async Task<ResolveType> Async () {
       while (this.state == State.Pending)
         await Task.Yield ();
