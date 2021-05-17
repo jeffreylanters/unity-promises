@@ -222,8 +222,7 @@ namespace ElRaccoone.Promises {
         await Task.Yield ();
       if (this.state == State.Rejected)
         throw this.rejectedValue;
-      else if (this.state == State.Resolved)
-        return this.resolvedValue;
+      return this.resolvedValue;
     }
   }
 }
