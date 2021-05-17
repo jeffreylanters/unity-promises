@@ -1,90 +1,175 @@
 ﻿using System.Collections;
+using System.Threading.Tasks;
 using UnityEngine;
+using System;
 
 namespace ElRaccoone.Promises.Tests {
+
+  /// <summary>
+  /// Promise Tests.
+  /// </summary>
   [AddComponentMenu ("El Raccoone/Promises/Tests/Promises Tests")]
   public class PromiseTests : MonoBehaviour {
+
+    /// <summary>
+    /// Draws the tester gui.
+    /// </summary>
     private void OnGUI () {
-      this.Draw_Test_Basic ();
-      this.Draw_Test_WithGenericResolve ();
-      this.Draw_Test_WithGenericResolveReject ();
-      this.Draw_Test_WithEnumerator ();
+      if (GUILayout.Button ("[TEST 1a]: Promise With Reject (Then/Catch)"))
+        this.RunTest1a ();
+      if (GUILayout.Button ("[TEST 1b]: Promise With Reject (Async/Await)"))
+        this.RunTest1b ();
+      if (GUILayout.Button ("[TEST 2a]: Promise With Generic Resolve And Reject (Then/Catch)"))
+        this.RunTest2a ();
+      if (GUILayout.Button ("[TEST 2b]: Promise With Generic Resolve And Reject (Async/Await)"))
+        this.RunTest2b ();
+      if (GUILayout.Button ("[TEST 3a]: Promise With Generic Resolve And Generic Reject (Then/Catch)"))
+        this.RunTest3a ();
+      if (GUILayout.Button ("[TEST 3b]: Promise With Generic Resolve And Generic Reject (Async/Await)"))
+        this.RunTest3b ();
     }
 
-    /// TEST: BASIC
-    private void Draw_Test_Basic () {
-      if (GUILayout.Button ("Run Test: Basic")) {
-        Debug.Log ("Running Test: Basic");
-        this.Test_Basic ()
-          .Then (() => Debug.Log ("Resolved Test: Basic"))
-          .Catch (reason => Debug.LogError ("Rejected Test: Basic: " + reason))
-          .Finally (() => Debug.Log ("Finnaly Test: Basic"));
-      }
+    /// <summary>
+    /// Runs test 1a.
+    /// </summary>
+    private void RunTest1a () {
+      Debug.Log ("[TEST 1a]: Running...");
+      this.EmptyPromise ()
+        .Then (() => Debug.Log ("[TEST 1a]: Resolved"))
+        .Catch (exception => Debug.LogError ($"[TEST 1a]: Rejected with exception: {exception}"))
+        .Finally (() => Debug.Log ("[TEST 1a]: Finalized!"));
     }
-    private Promise Test_Basic () {
+
+    /// <summary>
+    /// Runs test 1b.
+    /// </summary>
+    private async void RunTest1b () {
+      Debug.Log ("[TEST 1b]: Running...");
+      try {
+        await this.EmptyPromise ().Async ();
+        Debug.Log ("[TEST 1b]: Resolved");
+      } catch (Exception exception) {
+        Debug.LogError ($"[TEST 1b]: Rejected with exception: {exception}");
+      }
+      Debug.Log ("[TEST 1b]: Finalized!");
+    }
+
+    /// <summary>
+    /// Runs test 2a.
+    /// </summary>
+    private void RunTest2a () {
+      Debug.Log ("[TEST 2a]: Running...");
+      this.GetRandomNumberPromise ()
+        .Then (value => Debug.Log ($"[TEST 2a]: Resolved with value: {value}"))
+        .Catch (exception => Debug.LogError ($"[TEST 2a]: Rejected with exception: {exception}"))
+        .Finally (() => Debug.Log ("[TEST 2a]: Finalized!"));
+    }
+
+    /// <summary>
+    /// Runs test 2b.
+    /// </summary>
+    private async void RunTest2b () {
+      Debug.Log ("[TEST 2b]: Running...");
+      try {
+        var value = await this.GetRandomNumberPromise ().Async ();
+        Debug.Log ($"[TEST 2b]: Resolved with value: {value}");
+      } catch (Exception exception) {
+        Debug.LogError ($"[TEST 2b]: Rejected with exception: {exception}");
+      }
+      Debug.Log ("[TEST 2b]: Finalized!");
+    }
+
+    /// <summary>
+    /// Runs test 3a.
+    /// </summary>
+    private void RunTest3a () {
+      Debug.Log ("[TEST 3a]: Running...");
+      this.GetRandomNumberWithCustomException ()
+        .Then (value => Debug.Log ($"[TEST 3a]: Resolved with value: {value}"))
+        .Catch (exception => Debug.LogError ($"[TEST 3a]: Rejected with custom exception: {exception.number}"))
+        .Finally (() => Debug.Log ("[TEST 3a]: Finalized!"));
+    }
+
+    /// <summary>
+    /// Runs test 3b.
+    /// </summary>
+    private async void RunTest3b () {
+      Debug.Log ("[TEST 3b]: Running...");
+      try {
+        var value = await this.GetRandomNumberWithCustomException ().Async ();
+        Debug.Log ($"[TEST 3b]: Resolved with value: {value}");
+      } catch (CustomException exception) {
+        Debug.LogError ($"[TEST 3b]: Rejected with custom exception: {exception.number}");
+      }
+      Debug.Log ("[TEST 3b]: Finalized!");
+    }
+
+    /// <summary>
+    /// An empty promise randomly resolving or rejecting after a while.
+    /// </summary>
+    /// <returns>A promise containing the number.</returns>
+    private Promise EmptyPromise () {
       return new Promise ((resolve, reject) => {
-        if (Random.Range (0, 100) > 10)
-          resolve ();
-        else
-          reject ("Something went wrong");
+        this.StartCoroutine (this.GetRandomNumberRoutine (randomNumber => {
+          if (randomNumber > 25) {
+            resolve ();
+          } else {
+            reject (new Exception ($"Something went wrong {randomNumber}"));
+          }
+        }));
       });
     }
 
-    /// TEST: WITHGENERICRESOLVE
-    private void Draw_Test_WithGenericResolve () {
-      if (GUILayout.Button ("Run Test: WithGenericResolve")) {
-        Debug.Log ("Running Test: WithGenericResolve");
-        this.Test_WithGenericResolve ()
-          .Then (value => Debug.Log ("Resolved Test: WithGenericResolve: " + value))
-          .Catch (reason => Debug.LogError ("Rejected Test: WithGenericResolve: " + reason))
-          .Finally (() => Debug.Log ("Finnaly Test: WithGenericResolve"));
-      }
-    }
-    private Promise<int> Test_WithGenericResolve () {
+    /// <summary>
+    /// An promise randomly resolving or rejecting with a random number after a while.
+    /// </summary>
+    /// <returns>A promise containing the number.</returns>
+    private Promise<int> GetRandomNumberPromise () {
       return new Promise<int> ((resolve, reject) => {
-        if (Random.Range (0, 100) > 10)
-          resolve (Random.Range (0, 100));
-        else
-          reject ("Something went wrong");
+        this.StartCoroutine (this.GetRandomNumberRoutine (randomNumber => {
+          if (randomNumber > 25) {
+            resolve (randomNumber);
+          } else {
+            reject (new Exception ($"Something went wrong {randomNumber}"));
+          }
+        }));
       });
     }
 
-    /// TEST: WITHGENERICRESOLVEREJECT
-    private void Draw_Test_WithGenericResolveReject () {
-      if (GUILayout.Button ("Run Test: WithGenericResolveReject")) {
-        Debug.Log ("Running Test: WithGenericResolveReject");
-        this.Test_WithGenericResolveReject ()
-          .Then (value => Debug.Log ("Resolved Test: WithGenericResolveReject: " + value))
-          .Catch (reason => Debug.LogError ("Rejected Test: WithGenericResolveReject: " + reason))
-          .Finally (() => Debug.Log ("Finnaly Test: WithGenericResolveReject"));
-      }
-    }
-    private Promise<int, int> Test_WithGenericResolveReject () {
-      return new Promise<int, int> ((resolve, reject) => {
-        if (Random.Range (0, 100) > 10)
-          resolve (Random.Range (0, 100));
-        else
-          reject (404);
+    /// <summary>
+    /// Returns a random number between 0 and 100 with a custom exception.
+    /// </summary>
+    /// <returns>A promise containing the number.</returns>
+    private Promise<int, CustomException> GetRandomNumberWithCustomException () {
+      return new Promise<int, CustomException> ((resolve, reject) => {
+        this.StartCoroutine (this.GetRandomNumberRoutine (randomNumber => {
+          if (randomNumber > 25) {
+            resolve (randomNumber);
+          } else {
+            reject (new CustomException (randomNumber));
+          }
+        }));
       });
     }
 
-    /// TEST: WITHENUMERATOR
-    private void Draw_Test_WithEnumerator () {
-      if (GUILayout.Button ("Run Test: With Enumerator")) {
-        Debug.Log ("Running Test: With Enumerator");
-        this.Test_WithEnumerator ()
-          .Then (() => Debug.Log ("Resolved Test: With Enumerator"))
-          .Catch (reason => Debug.LogError ("Rejected Test: With Enumerator: " + reason))
-          .Finally (() => Debug.Log ("Finnaly Test: With Enumerator"));
+    /// <summary>
+    /// Invokes a callback with a number between 0 and 100 after some seconds...
+    /// </summary>
+    /// <param name="action">Action to be invoked.</param>
+    /// <returns>A coroutine.</returns>
+    private IEnumerator GetRandomNumberRoutine (Action<int> action) {
+      yield return new WaitForSeconds (UnityEngine.Random.Range (0f, 1f));
+      action (UnityEngine.Random.Range (0, 100));
+    }
+
+    /// <summary>
+    /// A custom exception type holding a single number.
+    /// </summary>
+    private class CustomException : Exception {
+      public int number { get; private set; } = -1;
+      public CustomException (int number) {
+        this.number = number;
       }
-    }
-    private Promise Test_WithEnumerator () {
-      return new Promise (this.WaitCoroutine ());
-    }
-    private IEnumerator WaitCoroutine () {
-      Debug.Log ("...Uno...");
-      yield return new WaitForSeconds (1);
-      Debug.Log ("...Dos...");
     }
   }
 }
