@@ -1,186 +1,64 @@
 using System;
 using System.Collections;
+using System.Threading.Tasks;
 using ElRaccoone.Promises.Core;
 
 namespace ElRaccoone.Promises {
 
-  /// Promise without any parameter types.
-  public class Promise {
-    private Action<Action, Action<string>> executor;
-    private Action onFulfilled;
-    private Action<string> onRejected;
-    private Action onFinally;
-
-    public PromiseState state = PromiseState.Pending;
-
-    public Promise (Action<Action, Action<string>> executor) {
-      PromiseTicker.enumerator.StartCoroutine (this.Execute (executor));
-    }
-
-    public Promise (Action<Action> executor) {
-      PromiseTicker.enumerator.StartCoroutine (this.Execute (executor));
-    }
-
-    public Promise (IEnumerator enumerator) {
-      PromiseTicker.enumerator.StartCoroutine (this.Execute (enumerator));
-    }
-
-    private IEnumerator Execute (Action<Action, Action<string>> executor) {
-      yield return null;
-      executor (
-        () => {
-          if (this.state != PromiseState.Pending)
-            return;
-          this.state = PromiseState.Fulfilled;
-          if (this.onFulfilled != null)
-            this.onFulfilled ();
-          if (this.onFinally != null)
-            this.onFinally ();
-        },
-        reason => {
-          if (this.state != PromiseState.Pending)
-            return;
-          this.state = PromiseState.Rejected;
-          if (this.onRejected != null)
-            this.onRejected (reason);
-          if (this.onFinally != null)
-            this.onFinally ();
-        });
-    }
-
-    private IEnumerator Execute (Action<Action> executor) {
-      yield return null;
-      executor (
-        () => {
-          if (this.state != PromiseState.Pending)
-            return;
-          this.state = PromiseState.Fulfilled;
-          if (this.onFulfilled != null)
-            this.onFulfilled ();
-          if (this.onFinally != null)
-            this.onFinally ();
-        });
-    }
-
-    private IEnumerator Execute (IEnumerator enumerator) {
-      try {
-        yield return enumerator;
-        this.state = PromiseState.Fulfilled;
-        if (this.onFulfilled != null)
-          this.onFulfilled ();
-      } finally {
-        if (this.state != PromiseState.Fulfilled) {
-          this.state = PromiseState.Rejected;
-          if (this.onRejected != null)
-            this.onRejected ("Enumator did not fulfill");
-        }
-        if (this.onFinally != null)
-          this.onFinally ();
-      }
-    }
-
-    public Promise Then (Action onFulfilled) {
-      this.onFulfilled = onFulfilled;
-      return this;
-    }
-
-    public Promise Catch (Action<string> onRejected) {
-      this.onRejected = onRejected;
-      return this;
-    }
-
-    public Promise Finally (Action onFinally) {
-      this.onFinally = onFinally;
-      return this;
-    }
-
-    public void Consume () {
-      this.state = PromiseState.Rejected;
-    }
-  }
-
+  /// <summary>
   /// Promise with a generic resolve parameter type.
-  public class Promise<ResolveType> {
-    private Action<Action<ResolveType>, Action<string>> executor;
-    private Action<ResolveType> onFulfilled;
-    private Action<string> onRejected;
-    private Action onFinally;
+  /// </summary>
+  /// <typeparam name="ResolveType">The type of the resolver's value.</typeparam>
+  public class Promise<ResolveType> : Promise<ResolveType, Exception> {
 
-    public PromiseState state = PromiseState.Pending;
-
-    public Promise (Action<Action<ResolveType>, Action<string>> executor) {
-      PromiseTicker.enumerator.StartCoroutine (this.Execute (executor));
-    }
-
-    public Promise (Action<Action<ResolveType>> executor) {
-      PromiseTicker.enumerator.StartCoroutine (this.Execute (executor));
-    }
-
-    private IEnumerator Execute (Action<Action<ResolveType>, Action<string>> executor) {
-      yield return null;
-      executor (
-        value => {
-          if (this.state != PromiseState.Pending)
-            return;
-          this.state = PromiseState.Fulfilled;
-          if (this.onFulfilled != null)
-            this.onFulfilled (value);
-          if (this.onFinally != null)
-            this.onFinally ();
-        }, reason => {
-          if (this.state != PromiseState.Pending)
-            return;
-          this.state = PromiseState.Rejected;
-          if (this.onRejected != null)
-            this.onRejected (reason);
-          if (this.onFinally != null)
-            this.onFinally ();
-        });
-    }
-
-    private IEnumerator Execute (Action<Action<ResolveType>> executor) {
-      yield return null;
-      executor (
-        value => {
-          if (this.state != PromiseState.Pending)
-            return;
-          this.state = PromiseState.Fulfilled;
-          if (this.onFulfilled != null)
-            this.onFulfilled (value);
-          if (this.onFinally != null)
-            this.onFinally ();
-        });
-    }
-
-    public Promise<ResolveType> Then (Action<ResolveType> onFulfilled) {
-      this.onFulfilled = onFulfilled;
-      return this;
-    }
-
-    public Promise<ResolveType> Catch (Action<string> onRejected) {
-      this.onRejected = onRejected;
-      return this;
-    }
-
-    public Promise<ResolveType> Finally (Action onFinally) {
-      this.onFinally = onFinally;
-      return this;
-    }
-
-    public void Consume () {
-      this.state = PromiseState.Rejected;
-    }
+    /// <summary>
+    /// Instanciates a new promise with an executor to either resolve or reject.
+    /// </summary>
+    /// <param name="executor">Callback method containing the resolve and reject methods.</param>
+    public Promise (Action<Action<ResolveType>, Action<Exception>> executor) : base (executor) { }
   }
 
+  /// <summary>
   /// Promise with a generic resolve and reject parameter type.
-  public class Promise<ResolveType, RejectType> {
-    private Action<Action<ResolveType>, Action<RejectType>> executor;
-    private Action<ResolveType> onFulfilled;
+  /// </summary>
+  /// <typeparam name="ResolveType">The type of the resolver's value.</typeparam>
+  /// <typeparam name="RejectType">the type of the rejector's value.</typeparam>
+  public class Promise<ResolveType, RejectType> where RejectType : Exception {
+
+    /// <summary>
+    /// Optional clalback for when the promise resolves.
+    /// </summary>
+    private Action<ResolveType> onResolve;
+
+    /// <summary>
+    /// Optional clalback for when the promise rejects.
+    /// </summary>
     private Action<RejectType> onRejected;
+
+    /// <summary>
+    /// Optional clalback for when the promise ends.
+    /// </summary>
     private Action onFinally;
 
+    /// <summary>
+    /// 
+    /// </summary>
+    private ResolveType resolveValue;
+
+    /// <summary>
+    /// 
+    /// </summary>
+    private RejectType rejectValue;
+
+    /// <summary>
+    /// The state of the promise.
+    /// </summary>
     public PromiseState state = PromiseState.Pending;
 
+    /// <summary>
+    /// Instanciates a new promise with an executor to either resolve or reject.
+    /// </summary>
+    /// <param name="executor">Callback method containing the resolve and reject methods.</param>
     public Promise (Action<Action<ResolveType>, Action<RejectType>> executor) {
       PromiseTicker.enumerator.StartCoroutine (this.Execute (executor));
     }
@@ -192,14 +70,16 @@ namespace ElRaccoone.Promises {
           if (this.state != PromiseState.Pending)
             return;
           this.state = PromiseState.Fulfilled;
-          if (this.onFulfilled != null)
-            this.onFulfilled (value);
+          this.resolveValue = value;
+          if (this.onResolve != null)
+            this.onResolve (value);
           if (this.onFinally != null)
             this.onFinally ();
         }, reason => {
           if (this.state != PromiseState.Pending)
             return;
           this.state = PromiseState.Rejected;
+          this.rejectValue = reason;
           if (this.onRejected != null)
             this.onRejected (reason);
           if (this.onFinally != null)
@@ -207,8 +87,8 @@ namespace ElRaccoone.Promises {
         });
     }
 
-    public Promise<ResolveType, RejectType> Then (Action<ResolveType> onFulfilled) {
-      this.onFulfilled = onFulfilled;
+    public Promise<ResolveType, RejectType> Then (Action<ResolveType> onResolve) {
+      this.onResolve = onResolve;
       return this;
     }
 
@@ -224,6 +104,14 @@ namespace ElRaccoone.Promises {
 
     public void Consume () {
       this.state = PromiseState.Rejected;
+    }
+
+    public async Task<ResolveType> Async () {
+      while (this.state == PromiseState.Pending)
+        await Task.Delay (1);
+      if (this.state == PromiseState.Rejected)
+        throw new Exception (this.rejectValue.ToString ());
+      return this.resolveValue;
     }
   }
 }
