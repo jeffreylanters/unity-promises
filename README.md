@@ -54,12 +54,9 @@ openupm add nl.elraccoone.promises
 ## Syntax
 
 ```cs
-new Promise(((resolve) => { /* ... */ }) );
-new Promise(((resolve, reject) => { /* ... */ }) );
-new Promise<ResolveType>(((resolve) => { /* ... */ }) );
-new Promise<ResolveType>(((resolve, reject) => { /* ... */ }) );
-new Promise<ResolveType, RejectType>(((resolve, reject) => { /* ... */ }) );
-new Promise(enumerator);
+new Promise ((resolve, reject) => { /* ... */ });
+new Promise<ResolveType> ((resolve, reject) => { /* ... */ });
+new Promise<ResolveType, RejectType> ((resolve, reject) => { /* ... */ });
 ```
 
 A function that is passed with the arguments resolve and reject. The executor function is executed immediately by the Promise implementation, passing resolve and reject functions (the executor is called before the Promise constructor even returns the created object). The resolve and reject functions, when called, resolve or reject the promise, respectively. The executor normally initiates some asynchronous work, and then, once that completes, either calls the resolve function to resolve the promise or else rejects it if an error occurred. If an error is thrown in the executor function, the promise is rejected. The return value of the executor is ignored.
@@ -82,51 +79,78 @@ A Promise object is created using the new keyword and its constructor. This cons
 
 ```cs
 public Promise LoadSomeData () {
-  // Return a new void promise and assign the executor. The reject overload is
-  // optional!
+  // Return a new void promise and assign the executor.
   return new Promise ((resolve, reject) => {
     // do something asynchronous which eventually calls either:
-    //   resolve(); // fulfilled
-    //   reject("failure reason"); // or rejected
+    resolve (); // to fulfill
+    reject (new Exception ("Failed")); // or reject
   });
 }
 
 public Promise<int> LoadSomeData () {
   // Return a new promise with a generic resolve type and assign the executor.
-  // The reject overload is optional!
   return new Promise<int> ((resolve, reject) => {
     // do something asynchronous which eventually calls either:
-    //   resolve(100); // fulfilled
-    //   reject("failure reason"); // or rejected
+    resolve (100); // to fulfill
+    reject (new Exception ("Not found!")); // or reject
   });
 }
 
-public Promise<int, bool> LoadSomeData () {
-  // Return a new promise with a generic resolve and reject type and assign the
-  // executor.
-  return new Promise<int, bool> ((resolve, reject) => {
+public Promise<string, CustomException> LoadSomeData () {
+  // Return a new promise with a generic resolve and reject type and assign the executor.
+  return new Promise<string, CustomException> ((resolve, reject) => {
     // do something asynchronous which eventually calls either:
-    //   resolve(100); // fulfilled
-    //   reject(false); // or rejected
+    resolve ("Hello World!"); // to fulfill
+    reject (new CustomException ()); // or reject
   });
-}
-
-public Promise LoadSomeData () {
-  // Return a new promise with a coroutine, the routine will be executed
-  // automatically and will resolve when completed.
-  return new Promise (LoadDataCoroutine());
 }
 ```
 
 ## Using a Promise
 
+### Using classic Then/Catch callbacks
+
 Execute your function and return a promise. You can use the Promise.Then() and Promise.Catch() methods to set actions that should be triggered when the promise resolves or failes. These methods return promises so they can be chained.
 
 ```cs
-public void Awake () {
+public void Start () {
   this.LoadSomeData()
-    .Then(num => { /* ... */ })
-    .Catch(reason => { /* ... */ })
-    .Finally(() => { /* ... */ });
+    .Then (value => { /* ... */ })
+    .Catch (reason => { /* ... */ })
+    .Finally (() => { /* ... */ });
+}
+```
+
+### Using Async/Await method
+
+When chaining multiple promises after one another or when simply wanting to prevent a lot of nested callbacks, use the async await logic to keep things simple. There are two ways of doing so, the simplest way does not require any changes on the promise's creation side. A basic implementation could be as following.
+
+```cs
+public async void Start () {
+  try {
+    var value = await this.LoadSomeData ().Async ();
+    // "Then"
+  } catch (Exception exception) {
+    // "Catch"
+  }
+  // "Finally"
+}
+```
+
+Another way would be to wrap the Async before returning it as a promise, this way the promise can be awaited right away when invoking it. But this also means it can no longer be used using callbacks. A basic implementation could be as following.
+
+```csharp
+public async Task<string> LoadSomeData () {
+  // Return and await a new Task with a generic type.
+  return await new Promise<string> ((resolve, reject) => {
+    // do something asynchronous which eventually calls either:
+    resolve ("Hello World!"); // to fulfill
+    reject (new Exception ("Whoops")); // or reject
+  }).Async();
+}
+
+public async void Start () {
+  var value = await this.LoadSomeData ();
+  // ...
 }
 ```
