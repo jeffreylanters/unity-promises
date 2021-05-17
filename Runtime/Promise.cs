@@ -1,28 +1,35 @@
 using System;
 using System.Threading.Tasks;
 
-// TODO add typeless Promise
-// TODO add enumatable Promise
-
 namespace ElRaccoone.Promises {
+
+  /// <summary>
+  /// A promise.
+  /// </summary>
+  public class Promise : Promise<Promise.Void, Exception> {
+
+    /// <summary>
+    /// Void placeholder for generic resolver.
+    /// </summary>
+    public class Void { }
+
+    /// <summary>
+    /// Instantiates a new promise with an executor consisting of a resolver and a rejector.
+    /// </summary>
+    /// <param name="executor">The executor.</param>
+    public Promise (Action<Action, Action<Exception>> executor) : base (executor) { }
+  }
 
   /// <summary>
   /// A promise with a generic resolve type.
   /// </summary>
   /// <typeparam name="ResolveType">The type of the resolver's value.</typeparam>
-  /// <typeparam name="RejectType">The type of the rejector's value.</typeparam>
   public class Promise<ResolveType> : Promise<ResolveType, Exception> {
 
     /// <summary>
-    /// Instantiates a new promise with an executor to resolve.
+    /// Instantiates a new promise with an executor consisting of a generic resolver and a rejector.
     /// </summary>
-    /// <param name="executor">Callback method containing the resolve method.</param>
-    public Promise (Action<Action<ResolveType>> executor) : base (executor) { }
-
-    /// <summary>
-    /// Instantiates a new promise with an executor to either resolve or reject.
-    /// </summary>
-    /// <param name="executor">Callback method containing the resolve and reject methods.</param>
+    /// <param name="executor">The executor.</param>
     public Promise (Action<Action<ResolveType>, Action<Exception>> executor) : base (executor) { }
   }
 
@@ -90,23 +97,15 @@ namespace ElRaccoone.Promises {
     }
 
     /// <summary>
-    /// Instantiates a new promise with an executor consisting a resolver.
+    /// Instantiates a new promise with an executor consisting of a resolver and a generic rejector.
     /// </summary>
     /// <param name="executor">The executor.</param>
-    public Promise (Action<Action> executor) {
+    public Promise (Action<Action, Action<RejectType>> executor) {
       this.Execute (executor);
     }
 
     /// <summary>
-    /// Instantiates a new promise with an executor consisting a generic resolver.
-    /// </summary>
-    /// <param name="executor">The executor.</param>
-    public Promise (Action<Action<ResolveType>> executor) {
-      this.Execute (executor);
-    }
-
-    /// <summary>
-    /// Instantiates a new promise with an executor consisting a generic resolver and generic rejector.
+    /// Instantiates a new promise with an executor consisting of a generic resolver and a generic rejector.
     /// </summary>
     /// <param name="executor">The executor.</param>
     public Promise (Action<Action<ResolveType>, Action<RejectType>> executor) {
@@ -117,18 +116,9 @@ namespace ElRaccoone.Promises {
     /// Executes the promise with a resolver.
     /// </summary>
     /// <param name="executor">The executor.</param>
-    private async void Execute (Action<Action> executor) {
+    private async void Execute (Action<Action, Action<RejectType>> executor) {
       await Task.Yield ();
-      executor (this.ExecuteResolver);
-    }
-
-    /// <summary>
-    /// Executes the promise with a generic resolver.
-    /// </summary>
-    /// <param name="executor">The executor.</param>
-    private async void Execute (Action<Action<ResolveType>> executor) {
-      await Task.Yield ();
-      executor (this.ExecuteResolve);
+      executor (this.ExecuteResolve, this.ExecuteReject);
     }
 
     /// <summary>
@@ -143,11 +133,10 @@ namespace ElRaccoone.Promises {
     /// <summary>
     /// Invokes the executor's resolve method.
     /// </summary>
-    private void ExecuteResolver () {
+    private void ExecuteResolve () {
       if (this.state != State.Pending)
         return;
       this.state = State.Fulfilled;
-      this.resolvedValue = value;
       if (this.onResolveCallback != null)
         this.onResolveCallback ();
       if (this.onFinallyCallback != null)
