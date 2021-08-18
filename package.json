@@ -3,5 +3,10 @@
   "displayName": "Promises",
   "version": "2.0.1",
   "unity": "2020.1",
-  "description": "Promises provide a simpler alternative for executing, composing, and managing asynchronous operations when compared to traditional callback-based approaches. They also allow you to handle asynchronous errors using approaches that are similar to synchronous try/catch."
+  "description": "Promises provide a simpler alternative for executing, composing, and managing asynchronous operations when compared to traditional callback-based approaches. They also allow you to handle asynchronous errors using approaches that are similar to synchronous try/catch.",
+  "type": "library",
+  "hideInEditor": false,
+  "documentationUrl": "https://github.com/jeffreylanters/unity-promises",
+  "changelogUrl": "https://github.com/jeffreylanters/unity-promises/releases",
+  "licensesUrl": "https://github.com/jeffreylanters/unity-promises/blob/master/LICENSE.md"
 }
