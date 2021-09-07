@@ -152,6 +152,8 @@ namespace ElRaccoone.Promises {
         return;
       this.state = State.Fulfilled;
       this.resolvedValue = value;
+      if (this.onResolveCallback != null)
+        this.onResolveCallback ();
       if (this.onGenericResolveCallback != null)
         this.onGenericResolveCallback (value);
       if (this.onFinallyCallback != null)
